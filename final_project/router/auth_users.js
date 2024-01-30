@@ -5,6 +5,7 @@ const regd_users = express.Router();
 
 let users = [];
 
+
 const isValid = (username)=>{ //returns boolean
     let userswithsamename = users.filter((user)=>{
         return user.username === username
@@ -49,8 +50,24 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  const reviewContent = req.query.review;
+  let username = req.session.authorization.username
+  console.log(isbn)
+  console.log(username)
+  if (!username){
+    return res.status(401).send("User not logged in")
+  }
+
+  if (!books[isbn]){
+    return res.send("Book not found");
+  }
+  if (!books[isbn].reviews){
+    books[isbn].reviews = {}
+  }
+  books[isbn].reviews [username] = reviewContent
+
+  return res.send("Review submitted successfully")
 });
 
 module.exports.authenticated = regd_users;
