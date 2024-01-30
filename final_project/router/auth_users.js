@@ -70,6 +70,30 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   return res.send("Review submitted successfully")
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+
+    // Decode the JWT to extract the username
+    let username = req.session.authorization.username
+    if (!username) {
+        return res.status(401).send("User not logged in");
+    }
+
+    if (!books[isbn]) {
+        return res.status(404).send("Book not found");
+    }
+
+    // Check if the user has a review for the book
+    if (books[isbn].reviews && books[isbn].reviews[username]) {
+        // Delete the review
+        delete books[isbn].reviews[username];
+        return res.send("Review deleted successfully");
+    } else {
+        return res.status(404).send("Review not found");
+    }
+});
+
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
